@@ -1,0 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --nav-height: 73px;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #fff1e8;
+  --color-primary-100: #ffdcc8;
+  --color-primary-200: #ffbf96;
+  --color-primary-300: #ffa363;
+  --color-primary-400: #ff8731;
+  --color-primary-500: #ff5a04;
+  --color-primary-600: #e85000;
+  --color-primary-700: #bf4200;
+  --color-primary-800: #963400;
+  --color-primary-900: #6d2600;
+
+  --color-secondary-50: #ede6f1;
+  --color-secondary-100: #d2c2de;
+  --color-secondary-200: #a98cbf;
+  --color-secondary-300: #8157a0;
+  --color-secondary-400: #592281;
+  --color-secondary-500: #300037;
+  --color-secondary-600: #28002e;
+  --color-secondary-700: #1c001f;
+  --color-secondary-800: #130015;
+  --color-secondary-900: #09000a;
+}
