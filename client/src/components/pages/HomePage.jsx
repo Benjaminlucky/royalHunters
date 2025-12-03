@@ -8,6 +8,7 @@ import WhyChooseUs from "../WhyChooseUs";
 import Gallery from "../Gallery";
 import CarrierNetwork from "../CarrierNetwork";
 import Contact from "../Contact";
+import ShippersSection from "../ShippersSection";
 
 const Homepage = () => {
   return (
@@ -16,23 +17,17 @@ const Homepage = () => {
         <Hero />
       </section>
 
-      <section id="about">
-        <About />
-        <KeyHighlights />
-      </section>
-
-      <section id="expedited">
-        <ExpeditedFreight />
-      </section>
-      <section id="choose">
-        <WhyChooseUs />
-      </section>
-      <section id="gallery">
-        <Gallery />
+      <section id="shippers">
+        <ShippersSection />
       </section>
       <section id="carrier">
         <CarrierNetwork />
       </section>
+
+      <section id="about">
+        <About />
+      </section>
+
       <section id="contact">
         <Contact />
       </section>

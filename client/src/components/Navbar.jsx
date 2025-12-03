@@ -6,12 +6,10 @@ import useScrollSpy from "../hooks/useScrollSpy.js";
 
 const menu = [
   { label: "Home", hash: "home" },
-  { label: "About us", hash: "about" },
-  { label: "Expedited Freight", hash: "expedited" },
-  { label: "Why Choose Us", hash: "choose" },
-  { label: "Gallery", hash: "gallery" },
-  { label: "Carrier Network", hash: "carrier" },
-  { label: "Contact us", hash: "contact" },
+  { label: "Shippers", hash: "shippers" },
+  { label: "Carriers", hash: "carrier" },
+  { label: "About Us", hash: "about" },
+  { label: "Contact Us", hash: "contact" },
 ];
 
 const Navbar = () => {
