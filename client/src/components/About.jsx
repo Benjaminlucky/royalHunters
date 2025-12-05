@@ -263,7 +263,7 @@ const About = () => {
           >
             <img
               // Updated placeholder image color to match the primary theme
-              src="https://placehold.co/800x500/ff5a04/FFFFFF?text=Logistics+Solution"
+              src="AboutImage.jpeg"
               alt="Royal Hunters LLC Logistics"
               className="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-2xl transition duration-300 hover:shadow-3xl"
             />

@@ -1,7 +1,7 @@
 // components/Navbar.jsx
 import React, { useState } from "react";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
-import logo from "/royalhuntersLogo.webp";
+import logo from "/RoyalHuntersLogoWebsite.svg";
 import useScrollSpy from "../hooks/useScrollSpy.js";
 
 const menu = [
@@ -34,10 +34,7 @@ const Navbar = () => {
       <nav className="max-w-[1300px] mx-auto  h-[80px] flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <img src={logo} alt="Royal Hunters" className="w-12 h-12" />
-          <h1 className="font-bold text-xl text-secondary-500">
-            ROYAL <span className="text-primary-500">HUNTERS</span>
-          </h1>
+          <img src={logo} alt="Royal Hunters" className="w-32 h-auto" />
         </div>
 
         {/* Desktop Menu */}

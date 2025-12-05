@@ -1,4 +1,45 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, FileText, CheckCircle } from "lucide-react";
+
+const primaryColor = "#ff5a04";
+const secondaryColor = "#300037";
+
+// Success Modal Component
+const SuccessModal = ({ onClose }) => (
+  <motion.div
+    initial={{ scale: 0.8, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    exit={{ scale: 0.8, opacity: 0 }}
+    className="bg-white p-8 rounded-lg shadow-2xl max-w-md mx-auto text-center"
+  >
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+    >
+      <CheckCircle
+        size={64}
+        className="mx-auto mb-4"
+        style={{ color: "#10b981" }}
+      />
+    </motion.div>
+    <h3 className="text-2xl font-bold mb-3" style={{ color: secondaryColor }}>
+      Application Submitted!
+    </h3>
+    <p className="text-gray-600 mb-6">
+      Thank you for applying! We've received your driver application and will
+      contact you soon to discuss next steps.
+    </p>
+    <button
+      onClick={onClose}
+      className="px-6 py-3 rounded-md font-semibold text-white transition-all duration-300 hover:scale-105"
+      style={{ backgroundColor: primaryColor }}
+    >
+      Close
+    </button>
+  </motion.div>
+);
 
 const items = [
   {
@@ -33,10 +74,343 @@ const items = [
   },
 ];
 
-const CarrierNetwork = () => {
-  const handleJoinClick = () => {
-    window.open("https://www.ritewaytrucking.com/employment/", "_blank");
+// --- FORM COMPONENTS ---
+const InputField = ({
+  label,
+  name,
+  type = "text",
+  required = true,
+  placeholder = "",
+  formData,
+  handleChange,
+}) => (
+  <div className="mb-4">
+    <label
+      htmlFor={name}
+      className="block text-sm font-medium text-gray-700 mb-1"
+    >
+      {label}
+      {required && "*"}
+    </label>
+    <input
+      type={type}
+      name={name}
+      id={name}
+      value={formData[name]}
+      onChange={handleChange}
+      required={required}
+      placeholder={placeholder}
+      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2"
+      style={{ borderColor: primaryColor, color: secondaryColor }}
+    />
+  </div>
+);
+
+const SelectField = ({
+  label,
+  name,
+  options,
+  required = true,
+  placeholder,
+  formData,
+  handleChange,
+}) => (
+  <div className="mb-4 w-full">
+    <label
+      htmlFor={name}
+      className="block text-sm font-medium text-gray-700 mb-1"
+    >
+      {label}
+      {required && "*"}
+    </label>
+    <select
+      name={name}
+      id={name}
+      value={formData[name]}
+      onChange={handleChange}
+      required={required}
+      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 appearance-none bg-white"
+      style={{ borderColor: primaryColor, color: secondaryColor }}
+    >
+      <option value="" disabled>
+        {placeholder}
+      </option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
+// --- DRIVER APPLICATION FORM ---
+const DriverApplicationForm = ({ onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    yourName: "",
+    emailAddress: "",
+    phoneNumber: "",
+    streetAddress: "",
+    city: "",
+    stateOrProvince: "",
+    cdlLicense: "",
+    cdlIssueState: "",
+    employmentType: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleSubmit = () => {
+    if (!formData.yourName || !formData.emailAddress || !formData.phoneNumber) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const emailBody = `
+New Driver Application
+
+Personal Information:
+- Name: ${formData.yourName}
+- Email: ${formData.emailAddress}
+- Phone: ${formData.phoneNumber}
+
+Address:
+- Street: ${formData.streetAddress}
+- City: ${formData.city}
+- State: ${formData.stateOrProvince}
+
+License Information:
+- CDL License #: ${formData.cdlLicense}
+- CDL Issue State: ${formData.cdlIssueState}
+- Employment Type: ${formData.employmentType}
+
+Note: Please attach resume separately if available.
+    `.trim();
+
+    const mailtoLink = `mailto:royalhuntersllc@gmail.com?subject=Driver Application - ${
+      formData.yourName
+    }&body=${encodeURIComponent(emailBody)}`;
+
+    window.location.href = mailtoLink;
+
+    setTimeout(() => {
+      setIsSubmitting(false);
+      onSuccess();
+    }, 1000);
   };
+
+  const employmentTypes = [
+    "Driver",
+    "Owner Operator",
+    "Company Driver",
+    "Lease Purchase",
+  ];
+  const states = [
+    "AL",
+    "AK",
+    "AZ",
+    "AR",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "ID",
+    "IL",
+    "IN",
+    "IA",
+    "KS",
+    "KY",
+    "LA",
+    "ME",
+    "MD",
+    "MA",
+    "MI",
+    "MN",
+    "MS",
+    "MO",
+    "MT",
+    "NE",
+    "NV",
+    "NH",
+    "NJ",
+    "NM",
+    "NY",
+    "NC",
+    "ND",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VT",
+    "VA",
+    "WA",
+    "WV",
+    "WI",
+    "WY",
+  ];
+
+  return (
+    <div className="bg-white p-6 md:p-8 rounded-lg shadow-2xl max-h-[90vh] overflow-y-auto w-full max-w-3xl mx-auto">
+      <div className="flex justify-between items-center mb-6 border-b pb-3">
+        <div>
+          <h3 className="text-2xl font-bold" style={{ color: secondaryColor }}>
+            Driver Application
+          </h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Use the form below to help us find the perfect position for you
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-gray-500 hover:text-red-500 p-1 transition"
+        >
+          <X size={24} />
+        </button>
+      </div>
+
+      <div>
+        {/* Row 1 */}
+        <div className="grid sm:grid-cols-3 gap-4">
+          <InputField
+            label="YOUR NAME"
+            name="yourName"
+            placeholder="John Doe"
+            formData={formData}
+            handleChange={handleChange}
+          />
+          <InputField
+            label="EMAIL ADDRESS"
+            name="emailAddress"
+            type="email"
+            placeholder="john@example.com"
+            formData={formData}
+            handleChange={handleChange}
+          />
+          <InputField
+            label="PHONE NUMBER"
+            name="phoneNumber"
+            type="tel"
+            placeholder="(555) 123-4567"
+            formData={formData}
+            handleChange={handleChange}
+          />
+        </div>
+
+        {/* Row 2 */}
+        <div className="grid sm:grid-cols-3 gap-4 mt-4">
+          <InputField
+            label="STREET ADDRESS"
+            name="streetAddress"
+            placeholder="123 Main Street"
+            formData={formData}
+            handleChange={handleChange}
+          />
+          <InputField
+            label="CITY"
+            name="city"
+            placeholder="Dallas"
+            formData={formData}
+            handleChange={handleChange}
+          />
+          <SelectField
+            label="STATE OR PROVINCE"
+            name="stateOrProvince"
+            options={states}
+            placeholder="Select State"
+            formData={formData}
+            handleChange={handleChange}
+          />
+        </div>
+
+        {/* Row 3 */}
+        <div className="grid sm:grid-cols-3 gap-4 mt-4">
+          <InputField
+            label="CDL LICENSE #"
+            name="cdlLicense"
+            placeholder="CDL123456"
+            formData={formData}
+            handleChange={handleChange}
+          />
+          <SelectField
+            label="CDL ISSUE STATE"
+            name="cdlIssueState"
+            options={states}
+            placeholder="Select State"
+            formData={formData}
+            handleChange={handleChange}
+          />
+          <SelectField
+            label="EMPLOYMENT TYPE"
+            name="employmentType"
+            options={employmentTypes}
+            placeholder="Select Type"
+            formData={formData}
+            handleChange={handleChange}
+          />
+        </div>
+
+        {/* Resume Upload */}
+        <div className="mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            YOUR RESUME*
+          </label>
+          <p className="text-sm text-gray-500 mb-2">
+            Please attach your resume to the email that will open after
+            submission.
+          </p>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="w-full mt-8 flex justify-center items-center py-3 px-6 border border-transparent rounded-md shadow-sm text-lg font-bold text-white transition duration-300 hover:scale-[1.01] uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ backgroundColor: primaryColor }}
+        >
+          {isSubmitting ? (
+            <>Processing...</>
+          ) : (
+            <>
+              <FileText size={20} className="mr-2" />
+              Submit Application
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const CarrierNetwork = () => {
+  const [isDriverModalOpen, setIsDriverModalOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const openDriverModal = useCallback(() => setIsDriverModalOpen(true), []);
+  const closeDriverModal = useCallback(() => setIsDriverModalOpen(false), []);
+
+  const handleSuccess = useCallback(() => {
+    setIsDriverModalOpen(false);
+    setShowSuccess(true);
+  }, []);
+
+  const closeSuccess = useCallback(() => {
+    setShowSuccess(false);
+  }, []);
 
   return (
     <div
@@ -105,7 +479,6 @@ const CarrierNetwork = () => {
                 e.currentTarget.style.boxShadow = "";
               }}
             >
-              {/* Icon Container */}
               <div
                 className="mb-5 p-4 rounded-full transition-all duration-300 text-5xl"
                 style={{
@@ -115,12 +488,10 @@ const CarrierNetwork = () => {
                 {item.icon}
               </div>
 
-              {/* Title */}
               <h4 className="text-xl font-bold text-white mb-3">
                 {item.title}
               </h4>
 
-              {/* Description */}
               <p
                 className="text-sm leading-relaxed"
                 style={{ color: "#d2c2de" }}
@@ -148,7 +519,7 @@ const CarrierNetwork = () => {
           </p>
 
           <button
-            onClick={handleJoinClick}
+            onClick={openDriverModal}
             className="font-bold py-4 px-10 rounded-lg uppercase tracking-wider transition-all duration-300 text-lg"
             style={{
               backgroundColor: "#ff5a04",
@@ -170,10 +541,53 @@ const CarrierNetwork = () => {
           </button>
 
           <p className="text-sm mt-6" style={{ color: "#a98cbf" }}>
-            Visit our employment portal to begin your application
+            Complete our driver application to begin your journey
           </p>
         </div>
       </div>
+
+      {/* DRIVER APPLICATION MODAL */}
+      <AnimatePresence>
+        {isDriverModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeDriverModal}
+            className="fixed inset-0 bg-black/70 z-50 flex justify-center items-center p-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-3xl"
+            >
+              <DriverApplicationForm
+                onClose={closeDriverModal}
+                onSuccess={handleSuccess}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* SUCCESS MODAL */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 z-50 flex justify-center items-center p-4 backdrop-blur-sm"
+            onClick={closeSuccess}
+          >
+            <motion.div onClick={(e) => e.stopPropagation()}>
+              <SuccessModal onClose={closeSuccess} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

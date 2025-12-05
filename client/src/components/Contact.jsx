@@ -1,19 +1,52 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, MapPin, X, Send, Truck } from "lucide-react";
+import { Phone, Mail, MapPin, X, Send, Truck, CheckCircle } from "lucide-react";
 
-const primaryColor = "#ff5a04"; // --color-primary-500 (Main Orange)
-const secondaryColor = "#300037"; // --color-secondary-500 (Dark Purple Accent)
-const lightAccent = "#fff1e8"; // --color-primary-50 (Light Background)
+const primaryColor = "#ff5a04";
+const secondaryColor = "#300037";
+const lightAccent = "#fff1e8";
 
-// --- MOCK REVEAL COMPONENT ---
 const Reveal = ({ children, className }) => (
   <div className={className}>{children}</div>
 );
 
-// --- MODAL: REQUEST A QUOTE FORM ---
+// Success Modal Component
+const SuccessModal = ({ onClose }) => (
+  <motion.div
+    initial={{ scale: 0.8, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    exit={{ scale: 0.8, opacity: 0 }}
+    className="bg-white p-8 rounded-lg shadow-2xl max-w-md mx-auto text-center"
+  >
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+    >
+      <CheckCircle
+        size={64}
+        className="mx-auto mb-4"
+        style={{ color: "#10b981" }}
+      />
+    </motion.div>
+    <h3 className="text-2xl font-bold mb-3" style={{ color: secondaryColor }}>
+      Quote Request Received!
+    </h3>
+    <p className="text-gray-600 mb-6">
+      Thank you for your interest! Our team will review your quote request and
+      get back to you within 24 hours.
+    </p>
+    <button
+      onClick={onClose}
+      className="px-6 py-3 rounded-md font-semibold text-white transition-all duration-300 hover:scale-105"
+      style={{ backgroundColor: primaryColor }}
+    >
+      Close
+    </button>
+  </motion.div>
+);
 
-// Mock data for dropdowns
+// --- MODAL: REQUEST A QUOTE FORM ---
 const truckTypes = [
   "Full or Partial",
   "Less Than Truckload (LTL)",
@@ -27,8 +60,7 @@ const neededTypes = [
   "Heavy Haul",
 ];
 
-const QuoteForm = ({ onClose }) => {
-  // Simple state to manage form fields (not actually submitting data)
+const QuoteForm = ({ onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -43,18 +75,57 @@ const QuoteForm = ({ onClose }) => {
     deliveryZip: "",
     questions: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // In a real application, you would handle submission logic here
-    console.log("Form Submitted:", formData);
-    onClose();
-    // Replace with a custom success message UI, not alert()
+  const handleSubmit = () => {
+    if (!formData.name || !formData.email || !formData.phone) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const emailBody = `
+New Freight Quote Request
+
+Contact Information:
+- Name: ${formData.name}
+- Company: ${formData.company}
+- Email: ${formData.email}
+- Phone: ${formData.phone}
+- Arrange Call: ${formData.arrangeCall.toUpperCase()}
+
+Load Requirements:
+- Truckload Type: ${formData.truckloadType}
+- Truck Type Needed: ${formData.truckTypeNeeded}
+
+Pickup Location:
+- Date: ${formData.pickupDate}
+- Zip Code: ${formData.pickupZip}
+
+Delivery Location:
+- Date: ${formData.deliveryDate}
+- Zip Code: ${formData.deliveryZip}
+
+Additional Information:
+${formData.questions || "None provided"}
+    `.trim();
+
+    const mailtoLink = `mailto:royalhuntersllc@gmail.com?subject=Freight Quote Request - ${
+      formData.company || formData.name
+    }&body=${encodeURIComponent(emailBody)}`;
+
+    window.location.href = mailtoLink;
+
+    setTimeout(() => {
+      setIsSubmitting(false);
+      onSuccess();
+    }, 1000);
   };
 
   const InputField = ({
@@ -156,7 +227,7 @@ const QuoteForm = ({ onClose }) => {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <div>
         {/* Contact Details */}
         <div className="grid sm:grid-cols-2 gap-4">
           <InputField label="Name" name="name" placeholder="Your Full Name" />
@@ -290,39 +361,22 @@ const QuoteForm = ({ onClose }) => {
           />
         </div>
 
-        <div className="mt-4 mb-6">
-          <label
-            htmlFor="file-upload"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Optional: File Upload
-          </label>
-          <div className="flex items-center justify-center w-full">
-            <label
-              htmlFor="file-upload"
-              className="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
-              style={{ borderColor: primaryColor }}
-            >
-              <div className="text-sm text-gray-600">CHOOSE A FILE</div>
-              <input
-                id="file-upload"
-                name="file-upload"
-                type="file"
-                className="hidden"
-              />
-            </label>
-          </div>
-        </div>
-
         <button
-          type="submit"
-          className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white transition duration-300 hover:scale-[1.01]"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="w-full mt-6 flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white transition duration-300 hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ backgroundColor: primaryColor }}
         >
-          <Send size={20} className="mr-2" />
-          Submit Request
+          {isSubmitting ? (
+            <>Processing...</>
+          ) : (
+            <>
+              <Send size={20} className="mr-2" />
+              Submit Request
+            </>
+          )}
         </button>
-      </form>
+      </div>
     </div>
   );
 };
@@ -330,9 +384,19 @@ const QuoteForm = ({ onClose }) => {
 // --- MAIN CONTACT COMPONENT ---
 export default function Contact() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
+
+  const handleSuccess = useCallback(() => {
+    setIsModalOpen(false);
+    setShowSuccess(true);
+  }, []);
+
+  const closeSuccess = useCallback(() => {
+    setShowSuccess(false);
+  }, []);
 
   const styleConfig = useMemo(
     () => ({
@@ -344,14 +408,11 @@ export default function Contact() {
     []
   );
 
-  // Use the full address for the Google Maps link
   const addressQuery = "1868 Ballinger Drive, Forney, TX 75126";
   const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     addressQuery
   )}`;
 
-  // Use a static image placeholder URL instead of an interactive iframe
-  // This visually represents the location without requiring an API key.
   const staticMapPlaceholderUrl = `https://placehold.co/800x400/${primaryColor.substring(
     1
   )}/FFFFFF?text=${encodeURIComponent("Royal Hunters LLC Location")}`;
@@ -384,8 +445,8 @@ export default function Contact() {
 
           <p className="text-white/70 mt-6 leading-relaxed text-xl">
             Experience a freight brokerage built on dependability,
-            affordability, and trust. Whether you’re shipping across Texas,
-            across the country, or across the world — we’ve got you covered.
+            affordability, and trust. Whether you're shipping across Texas,
+            across the country, or across the world — we've got you covered.
           </p>
         </Reveal>
 
@@ -423,10 +484,10 @@ export default function Contact() {
                 <div className="flex flex-col">
                   <span className="font-medium">Email Support</span>
                   <a
-                    href="mailto:support@royalhuntersllc.com"
+                    href="mailto:royalhuntersllc@gmail.com"
                     className="text-white/80 hover:text-white transition"
                   >
-                    support@royalhuntersllc.com
+                    royalhuntersllc@gmail.com
                   </a>
                 </div>
               </div>
@@ -455,7 +516,7 @@ export default function Contact() {
               whileTap={{ scale: 0.98 }}
             >
               <Truck size={20} className="mr-3" />
-              Request A Quote
+              Get an Instant Quote
             </motion.button>
           </div>
 
@@ -466,13 +527,11 @@ export default function Contact() {
               onClick={handleMapClick}
               title="Click to view full map in Google Maps"
             >
-              {/* Static Placeholder Image */}
               <img
                 src={staticMapPlaceholderUrl}
                 alt="Static Map Placeholder for 1868 Ballinger Drive, Forney, TX 75126"
                 className="w-full h-full object-cover transition duration-300 group-hover:opacity-80"
               />
-              {/* Overlay for Click-to-Open Action */}
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300">
                 <div className="flex flex-col items-center p-4 rounded-lg bg-white/90">
                   <MapPin size={32} style={{ color: primaryColor }} />
@@ -502,10 +561,27 @@ export default function Contact() {
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 50, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()} // Prevent closing on modal content click
+                onClick={(e) => e.stopPropagation()}
                 className="w-full max-w-2xl"
               >
-                <QuoteForm onClose={closeModal} />
+                <QuoteForm onClose={closeModal} onSuccess={handleSuccess} />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* SUCCESS MODAL */}
+        <AnimatePresence>
+          {showSuccess && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 z-50 flex justify-center items-center p-4 backdrop-blur-sm"
+              onClick={closeSuccess}
+            >
+              <motion.div onClick={(e) => e.stopPropagation()}>
+                <SuccessModal onClose={closeSuccess} />
               </motion.div>
             </motion.div>
           )}
